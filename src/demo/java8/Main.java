@@ -1,62 +1,56 @@
 package demo.java8;
 
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
-import java.util.function.Consumer;
+import java.util.function.BinaryOperator;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 public class Main {
     public static void main(String[] args) {
         List<Integer> list = Arrays.asList(1, 2, 3, 4, 5, 6);
 
-        // iterating list with external iterators
+        // to print the doubled the value of each item in the list conventionally we'll have to do
 
-        // with conventional for loop
-        for (int i = 0; i < list.size(); i++) {
-            System.out.print(list.get(i));
-        }
 
-        // with enhanced for loop
         for (Integer i : list) {
-            System.out.print(i);
+            System.out.println(i * 2);
         }
 
-        // with iterators
-
-        Iterator iterator = list.iterator();
-        while (iterator.hasNext()) {
-            System.out.print(iterator.next());
+        // what if we want to double each item and then add them
+        Integer result = 0;
+        for (Integer i : list) {
+            result += i * 2;
         }
+        System.out.println(result);
+
+        // with java 8 above can be achieved in smarter and efficient way
 
 
-        // iterating with internal iterators
+        Integer sum = list.stream().map(i -> i * 2).reduce(0, (a, e) -> a + e);
+        System.out.println("sum = " + sum);
+
+        // to understand the above code let's divide it into more chunks and understand each of them
 
 
-        Consumer<Integer> consumer = new Consumer<Integer>() {
-            public void accept(Integer i) {
-                System.out.println(i);
+        Stream<Integer> stream = list.stream();
+
+        Function<Integer, Integer> mapFunction = new Function<Integer, Integer>() {
+            @Override
+            public Integer apply(Integer integer) {
+                return integer * 2;
             }
         };
 
-        list.forEach(consumer);
+        BinaryOperator<Integer> binaryOperator = new BinaryOperator<Integer>() {
+            @Override
+            public Integer apply(Integer integer, Integer integer2) {
+                return integer + integer2;
+            }
+        };
 
+        Integer sum1 = stream.map(mapFunction).reduce(0, binaryOperator);
 
-        // above anonymous consumer class can be written as lambda expression
-
-
-        Consumer<Integer> consumer1 = i -> System.out.println(i);
-        list.forEach(consumer1);
-
-        // above lambda expression can be shorten by using method reference for printing
-
-
-        Consumer<Integer> consumer2 = System.out::print;
-        list.forEach(consumer2);
-
-        // above reference variable consumer2 does not need to be declared, hence whole printing code can be
-        // shorten by passing method reference in forEach
-
-
-        list.forEach(System.out::println);
+        System.out.println("sum1 = " + sum1);
     }
 }
